@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>MeanToDo</title>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+</head>
+<body>
+<div class="navbar navbar-inverse">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="#">iMeanToDo</a>
+        </div>
+    </div>
+</div>
+<div class="container" ng-app="ToDoApp" ng-controller="ToDoController">
+    <div class="row">
+        <div class="col-md-4 col-md-offset-4">
+            <div class="panel panel-success">
+                <div class="panel-heading">
+                    My MeanToDos
+                </div>
+                <div class="panel-body">
+<div class="row" ng-repeat="item in myToDos">
+    <div class="col-md-8">
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" ng-model="item.isCompleted"> {{item.taskDescription}}
+            </label>
+        </div>
+    </div>
+    <div class="col-md-4">{{item.dueDate}}</div>
+</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+<style>
+    input, button, div,.navbar, select {
+        border-radius: 0px !important;
+    }
+</style>
+<script>
+    var app = angular.module("ToDoApp", []);
+    app.controller("ToDoController", function($scope, $http){
+        $scope.myToDos = [];
+        var url = "/MyToDos";
+        $http.get(url).success(function (response) {
+            $scope.myToDos = response;
+        });
+    })
+</script>
+</html>
