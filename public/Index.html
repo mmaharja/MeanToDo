@@ -7,6 +7,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
     <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="javascripts/ui-bootstrap-tpls-0.14.3.min.js"></script>
 </head>
 <body>
 <div class="navbar navbar-inverse">
@@ -23,22 +24,51 @@
 </div>
 <div class="container" ng-app="ToDoApp" ng-controller="ToDoController">
     <div class="row">
-        <div class="col-md-4 col-md-offset-4">
+        <div class="col-md-6 col-md-offset-3">
             <div class="panel panel-success">
                 <div class="panel-heading">
                     My MeanToDos
                 </div>
                 <div class="panel-body">
-<div class="row" ng-repeat="item in myToDos">
-    <div class="col-md-8">
-        <div class="checkbox">
-            <label>
-                <input type="checkbox" ng-model="item.isCompleted"> {{item.taskDescription}}
-            </label>
-        </div>
-    </div>
-    <div class="col-md-4">{{item.dueDate}}</div>
-</div>
+                    <div class="row" ng-repeat="item in myToDos">
+                        <div class="col-md-8">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" ng-model="item.isCompleted"> {{item.taskDescription}}
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-3">{{item.dueDate}}</div>
+                        <a class="btn">
+                            <span ng-click="deleteToDo(item)" class="glyphicon glyphicon-trash"
+                                  aria-hidden="true"></span>
+                        </a>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-inline">
+                                <div class="form-group">
+                                    <input type="text" ng-model="newTaskDesc" class="form-control"
+                                           placeholder="New Task">
+                                </div>
+                                <div class="form-group">
+                                    <input type="text" ng-model="newDueDate" class="form-control"
+                                           placeholder="Due Date">
+                                </div>
+                                <!--<p class="input-group">-->
+                                <!--<input type="text" class="form-control" uib-datepicker-popup="{{format}}"-->
+                                <!--ng-model="dt" is-open="status.opened" min-date="minDate" max-date="maxDate"-->
+                                <!--datepicker-options="dateOptions" date-disabled="disabled(date, mode)"-->
+                                <!--ng-required="true" close-text="Close"/>-->
+                                <!--<span class="input-group-btn">-->
+                                <!--<button type="button" class="btn btn-default" ng-click="open($event)"><i-->
+                                <!--class="glyphicon glyphicon-calendar"></i></button>-->
+                                <!--</span>-->
+                                <!--</p>-->
+                                <button type="button" ng-click="addNewTask()" class="btn btn-primary">+</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -46,18 +76,31 @@
 </div>
 </body>
 <style>
-    input, button, div,.navbar, select {
+    input, button, div, .navbar, select {
         border-radius: 0px !important;
     }
 </style>
 <script>
     var app = angular.module("ToDoApp", []);
-    app.controller("ToDoController", function($scope, $http){
+    app.controller("ToDoController", function ($scope, $http) {
         $scope.myToDos = [];
         var url = "/MyToDos";
         $http.get(url).success(function (response) {
             $scope.myToDos = response;
         });
+        $scope.today = function () {
+            $scope.dt = new Date();
+        };
+
+        $scope.addNewTask = function () {
+            var newTask = {isCompleted: false, taskDescription: $scope.newTaskDesc, dueDate: $scope.newDueDate}
+            $scope.myToDos.push(newTask);
+        }
+
+        $scope.deleteToDo = function (item) {
+            var index = $scope.myToDos.indexOf(item);
+            $scope.myToDos.splice(index, 1);
+        };
     })
 </script>
 </html>
