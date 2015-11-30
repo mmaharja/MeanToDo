@@ -47,12 +47,13 @@
                     <div class="row">
                         <div class="col-md-12">
                             <div class="form-inline">
+                                <input type="hidden" ng-model="newToDo.isCompleted" value="false">
                                 <div class="form-group">
-                                    <input type="text" ng-model="newTaskDesc" class="form-control"
+                                    <input type="text" ng-model="newToDo.taskDescription" class="form-control"
                                            placeholder="New Task">
                                 </div>
                                 <div class="form-group">
-                                    <input type="text" ng-model="newDueDate" class="form-control"
+                                    <input type="text" ng-model="newToDo.dueDate" class="form-control"
                                            placeholder="Due Date">
                                 </div>
                                 <!--<p class="input-group">-->
@@ -69,6 +70,9 @@
                             </div>
                         </div>
                     </div>
+                    <div class="alert">
+                        {{result.message}}
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,22 +87,29 @@
 <script>
     var app = angular.module("ToDoApp", []);
     app.controller("ToDoController", function ($scope, $http) {
+        $scope.newToDo = {
+            isCompleted: false,
+            taskDescription: "",
+            dueDate: ""
+        };
         $scope.myToDos = [];
+        $scope.result = {success: "", message: ""};
         var url = "/MyToDos";
+
         $http.get(url).success(function (response) {
             $scope.myToDos = response;
         });
-        $scope.today = function () {
-            $scope.dt = new Date();
-        };
 
         $scope.addNewTask = function () {
-            var newTask = {isCompleted: false, taskDescription: $scope.newTaskDesc, dueDate: $scope.newDueDate}
-            $scope.myToDos.push(newTask);
+            var item = $scope.newToDo;
+            $http.post('/MyToDos/AddNewTask', $scope.newToDo);
+            $scope.myToDos.push({isCompleted: false, taskDescription: item.taskDescription, dueDate: item.dueDate});
+            $scope.newToDo = {};
         }
 
         $scope.deleteToDo = function (item) {
             var index = $scope.myToDos.indexOf(item);
+            $http.post('/MyToDos', item);
             $scope.myToDos.splice(index, 1);
         };
     })
