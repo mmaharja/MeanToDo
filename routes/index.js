@@ -13,17 +13,25 @@ router.get('/', function (req, res, next) {
 
 router.get('/myTodos', function (req, res) {
     db.toDos.find(function (err, todos) {
-        console.log(todos);
-        res.json(todos);
-    });
-    //var todos = [{isCompleted:true, taskDescription:"First Task", dueDate: "11/25/2015"},
-    //  {isCompleted:false, taskDescription:"Second Task", dueDate: "11/26/2015"}];
+        if(err){
+            var result = createResult(err,"Couldn't get todo list.", "");
+            res.json(result);
+        }
+        else{
+            console.log(todos);
+            res.json(todos);
+        }
 
-})
+    });
+});
 
 router.post('/myTodos/addNewTodo', function (req, res) {
     console.log(req.body);
-    db.toDos.insert(req.body);
+    db.toDos.insert(req.body, function (err, doc) {
+        var result = createResult(err, "ERROR: New Task wasn't added. Please try again!",
+            "SUCCESS: New task was added successfully!");
+        res.json(result);
+    });
 });
 router.delete('/myTodos/deleteTodo/:id', function (req, res) {
     console.log(req.params._id);
@@ -31,4 +39,31 @@ router.delete('/myTodos/deleteTodo/:id', function (req, res) {
     });
 });
 
+router.post('/myTodos/updateStatus', function (req, res) {
+    var item = req.body;
+    db.toDos.findAndModify({
+        query: {_id: db.ObjectId(item._id)},
+        update: {$set: {isCompleted: item.isCompleted}},
+        new: true
+    }, function (err, doc, lastErrorObject) {
+        // doc.tag === 'maintainer'
+    })
+    console.log("post called");
+    console.log(req.body);
+    var item = JSON.parse(req.body);
+    db.toDos.update({_id: db.ObjectId(item._id)}, {$set: {isCompleted: item.isCompleted}});
+});
+
+function createResult(err, errorMsg, successMsg) {
+    var success = false;
+    var message = '';
+    if (err) {
+        message = errorMsg;
+    }
+    else {
+        success = true;
+        message = successMsg;
+    }
+    return {success: success, message: message};
+}
 module.exports = router;
