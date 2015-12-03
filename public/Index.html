@@ -31,6 +31,7 @@
                 </div>
                 <div class="panel-body">
                     <div class="row" ng-repeat="item in myToDos">
+                        <input type="hidden" value="{{item._id}}">
                         <div class="col-md-8">
                             <div class="checkbox">
                                 <label>
@@ -88,6 +89,7 @@
     var app = angular.module("ToDoApp", []);
     app.controller("ToDoController", function ($scope, $http) {
         $scope.newToDo = {
+            _id:"",
             isCompleted: false,
             taskDescription: "",
             dueDate: ""
@@ -102,14 +104,14 @@
 
         $scope.addNewTask = function () {
             var item = $scope.newToDo;
-            $http.post('/MyToDos/AddNewTask', $scope.newToDo);
+            $http.post('/myTodos/addNewTodo', $scope.newToDo);
             $scope.myToDos.push({isCompleted: false, taskDescription: item.taskDescription, dueDate: item.dueDate});
             $scope.newToDo = {};
         }
 
         $scope.deleteToDo = function (item) {
             var index = $scope.myToDos.indexOf(item);
-            $http.post('/MyToDos', item);
+          $http.delete('/myTodos/deleteTodo/' + item._id);
             $scope.myToDos.splice(index, 1);
         };
     })
