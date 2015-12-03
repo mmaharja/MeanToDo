@@ -25,13 +25,14 @@
 <div class="container" ng-app="ToDoApp" ng-controller="ToDoController">
     <div class="row">
         <div class="col-md-6 col-md-offset-3">
-
-            <div class="panel panel-success">
+            <div class="panel panel-info">
                 <div class="panel-heading">
                     My MeanToDos
                 </div>
                 <div class="panel-body">
                     <div class="">
+                        <h3 ng-show="myToDos.length==0" class="text-info">Add a Task to get started!</h3>
+
                         <table id="todoTable" class="table table-hover table-stripped">
                             <thead>
                             <tr>
@@ -41,7 +42,7 @@
                             </tr>
                             </thead>
                             <tbody>
-                            <tr ng-repeat="item in myToDos">
+                            <tr ng-repeat="item in myToDos" ng-show="myToDos.length>0">
                                 <td>
                                     <span hidden="hidden">{{item._id}}</span>
 
@@ -56,10 +57,6 @@
                                 <td>
                                     <a class="btn">
                             <span ng-click="deleteToDo(item)" class="glyphicon glyphicon-trash"
-                                  aria-hidden="true"></span>
-                                    </a>
-                                    <a class="btn">
-                            <span ng-click="edit(item)" class="glyphicon glyphicon-edit"
                                   aria-hidden="true"></span>
                                     </a>
                                 </td>
@@ -119,7 +116,7 @@
     var app = angular.module("ToDoApp", []);
     app.controller("ToDoController", function ($scope, $http) {
         $scope.myToDos = [];
-        $scope.result = {success: "", message: ""};
+
         var url = "/MyToDos";
 
         $http.get(url).success(function (response) {
@@ -131,18 +128,13 @@
             $http.post('/myTodos/addNewTodo', $scope.myTodo)
                     .success(function (res) {
                                 if (res.success) {
-                                    $scope.myToDos.push({
-                                        isCompleted: false,
-                                        taskDescription: item.taskDescription,
-                                        dueDate: item.dueDate
-                                    });
+                                    $scope.myToDos.push(res.todo);
                                     $scope.myTodo = {};
                                 }
                                 handleResponse(res)
                             }
                     )
                     .error(handleError);
-
         };
 
         $scope.deleteToDo = function (item) {
@@ -158,8 +150,10 @@
         };
 
         $scope.updateStatus = function (item) {
-            $http.post('/myTodos/updateStatus', item)
-                    .success(handleResponse())
+            $http.post('/myTodos/updateStatus', {_id:'adfdfd', isCompleted: false, taskDescription:'', dueDate:''})
+                    .success(function(res){
+                        handleResponse(res);
+                    })
                     .error(handleError);
         };
 

@@ -27,15 +27,19 @@ router.get('/myTodos', function (req, res) {
 
 router.post('/myTodos/addNewTodo', function (req, res) {
     console.log(req.body);
-    db.toDos.insert(req.body, function (err, doc) {
-        var result = createResult(err, "ERROR: New Task wasn't added. Please try again!",
-            "SUCCESS: New task was added successfully!");
+    db.toDos.insert(req.body, function (err, todo) {
+        var result = createResult(err,
+            "'"+todo.taskDescription+"' wasn't added. Please try again!",
+            "'"+todo.taskDescription+"' was added successfully!", todo);
         res.json(result);
     });
 });
 router.delete('/myTodos/deleteTodo/:id', function (req, res) {
-    console.log(req.params._id);
     db.toDos.remove({_id: db.ObjectId(req.params.id)}, function (err, todo) {
+        var result = createResult(err,
+            "Unable to delete.",
+            "Task was deleted from list", todo);
+   res.json(result);
     });
 });
 
@@ -45,25 +49,31 @@ router.post('/myTodos/updateStatus', function (req, res) {
         query: {_id: db.ObjectId(item._id)},
         update: {$set: {isCompleted: item.isCompleted}},
         new: true
-    }, function (err, doc, lastErrorObject) {
-        // doc.tag === 'maintainer'
-    })
-    console.log("post called");
-    console.log(req.body);
-    var item = JSON.parse(req.body);
-    db.toDos.update({_id: db.ObjectId(item._id)}, {$set: {isCompleted: item.isCompleted}});
+    }, function (err, todo) {
+        var taskDesc = todo.taskDescription;
+        var result = createResult(err,"failed to update task '" +taskDesc + "'", "'"+ taskDesc +"' updated", null);
+        console.log(result);
+        res.json(result);
+    });
+    //console.log(req.body);
+    //var item = JSON.parse(req.body);
+    //db.toDos.update({_id: db.ObjectId(item._id)}, {$set: {isCompleted: item.isCompleted}});
 });
 
-function createResult(err, errorMsg, successMsg) {
+function createResult(err, errorMsg, successMsg, todo) {
     var success = false;
     var message = '';
+    var todoOut ={};
     if (err) {
-        message = errorMsg;
+        message = "ERROR!! " + errorMsg;
     }
     else {
         success = true;
-        message = successMsg;
+        message = "SUCCESS!! " + successMsg;
+        if(todo != null){
+            todoOut = todo;
+        }
     }
-    return {success: success, message: message};
+    return {success: success, message: message, todo: todoOut};
 }
 module.exports = router;
