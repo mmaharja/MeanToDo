@@ -45,6 +45,7 @@ router.delete('/myTodos/deleteTodo/:id', function (req, res) {
 
 router.post('/myTodos/updateStatus', function (req, res) {
     var item = req.body;
+    console.log(item);
     db.toDos.findAndModify({
         query: {_id: db.ObjectId(item._id)},
         update: {$set: {isCompleted: item.isCompleted}},

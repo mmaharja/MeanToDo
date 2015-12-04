@@ -13,32 +13,27 @@
 <div class="navbar navbar-inverse">
     <div class="container">
         <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
             <a class="navbar-brand" href="#">iMeanToDo</a>
         </div>
     </div>
 </div>
 <div class="container" ng-app="ToDoApp" ng-controller="ToDoController">
     <div class="row">
-        <div class="col-md-6 col-md-offset-3">
+        <div class="col-md-6 col-sm-8 col-xs-8 col-md-offset-3 col-sm-offset-2 col-xs-offset-2">
             <div class="panel panel-info">
                 <div class="panel-heading">
                     My MeanToDos
                 </div>
                 <div class="panel-body">
-                    <div class="">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
                         <h3 ng-show="myToDos.length==0" class="text-info">Add a Task to get started!</h3>
 
                         <table id="todoTable" class="table table-hover table-stripped">
                             <thead>
                             <tr>
-                                <th class="col-md-6">Task</th>
-                                <th class="col-md-4">Due Date</th>
-                                <th class="col-md-2">Actions</th>
+                                <th class="col-md-6 col-sm-6 col-xs-6">Task</th>
+                                <th class="col-md-4 col-sm-6 col-xs-4">Due Date</th>
+                                <th class="col-md-4 col-sm-6 col-xs-2">Actions</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -61,45 +56,34 @@
                                     </a>
                                 </td>
                             </tr>
-                            <tr>
-                                <td>
-                                    <input type="hidden" ng-model="myTodo.isCompleted" value="false">
-                                    <input type="text" ng-model="myTodo.taskDescription" class="form-control"
-                                           placeholder="New Task">
-                                </td>
-                                <td>
-                                    <input type="text" ng-model="myTodo.dueDate" class="form-control"
-                                           placeholder="Due Date">
-                                </td>
-                                <td>
-                                    <button type="button" ng-click="addNewTask()" class="btn btn-primary">Save</button>
-                                </td>
-                            </tr>
                             </tbody>
                         </table>
+                        <form name="frmNewTask" novalidate id="frmNewTask"
+                              ng-submit="frmNewTask.$valid && addNewTask()">
+                            <div class="row">
+                                <div class="col-md-6 col-sm-6 col-xs-6">
+                                    <input type="hidden" ng-model="myTodo.isCompleted" value="false">
+                                    <input type="text" name="taskDescription" ng-model="myTodo.taskDescription"
+                                           class="form-control"
+                                           placeholder="New Task" ng-required=true ng-minlength="3">
+                                    <span class="help-inline"
+                                          ng-show="submitted && form.email.$error.required">Required</span>
 
-                    </div>
-                    <!--<div class="row" ng-repeat="item in myToDos">-->
-                    <!--<input type="hidden" value="{{item._id}}">-->
+                                </div>
+                                <div class="col-md-4 col-sm-4 col-xs-4">
+                                    <input type="text" ng-model="myTodo.dueDate" class="form-control"
+                                           placeholder="Due Date" required></div>
+                                <div class="col-md-2 col-sm-2 col-xs-2">
+                                    <button type="submit" class="btn btn-primary">Save</button>
+                                </div>
+                            </div>
+                        </form>
 
-                    <!--<div class="col-md-8">-->
-                    <!--<div class="checkbox">-->
-                    <!--<label>-->
-                    <!--<input type="checkbox" ng-model="item.isCompleted" ng-click="updateToDo(item)">-->
-                    <!--{{item.taskDescription}}-->
-                    <!--</label>-->
-                    <!--</div>-->
-                    <!--</div>-->
-                    <!--<div class="col-md-3">{{item.dueDate}}</div>-->
-                    <!--<a class="btn">-->
-                    <!--<span ng-click="deleteToDo(item)" class="glyphicon glyphicon-trash"-->
-                    <!--aria-hidden="true"></span>-->
-                    <!--</a>-->
-                    <!--</div>-->
-                    <div ng-class="alert">
-                        {{message}}
                     </div>
                 </div>
+            </div>
+            <div ng-class="alert">
+                {{message}}
             </div>
         </div>
     </div>
@@ -110,7 +94,25 @@
         border-radius: 0px !important;
     }
 
+    .ng-invalid.ng-dirty {
+        border-color: #FA787E;
+    }
 
+    .ng-valid.ng-dirty {
+        border-color: #78FA89;
+    }
+
+    .checkbox {
+        margin-top: 0px !important;
+        margin-bottom: 0px !important;
+    }
+
+    .task {
+        border-bottom: 1px solid silver;
+        margin-left: 5px;
+        margin-right: 5px;
+
+    }
 </style>
 <script>
     var app = angular.module("ToDoApp", []);
@@ -140,8 +142,8 @@
         $scope.deleteToDo = function (item) {
             var index = $scope.myToDos.indexOf(item);
             $http.delete('/myTodos/deleteTodo/' + item._id)
-                    .success(function(res){
-                        if(res.success) {
+                    .success(function (res) {
+                        if (res.success) {
                             $scope.myToDos.splice(index, 1);
                         }
                         handleResponse(res);
@@ -150,8 +152,8 @@
         };
 
         $scope.updateStatus = function (item) {
-            $http.post('/myTodos/updateStatus', {_id:'adfdfd', isCompleted: false, taskDescription:'', dueDate:''})
-                    .success(function(res){
+            $http.post('/myTodos/updateStatus', item)
+                    .success(function (res) {
                         handleResponse(res);
                     })
                     .error(handleError);
